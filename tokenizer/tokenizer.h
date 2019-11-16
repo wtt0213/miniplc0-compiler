@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tokenizer/token.h"
+#include "../tokenizer/token.h"
 #include "tokenizer/utils.hpp"
 #include "error/error.h"
 
@@ -64,7 +64,7 @@ namespace miniplc0 {
 		void readAll();
 		// 一个简单的总结
 		// 偏移   | 0 | 1 | 2 | 3 | 4 | 4 | 5 | 6 | 7 | 8 | 9  |
-		//        | = | = | = | = | = | = | = | = | = | = | =  |
+		//       | = | = | = | = | = | = | = | = | = | = | =  |
 		// 缓冲区 | h | a | 1 | 9 | 2 | 6 | 0 | 8 | 1 | 7 | \n |（第0行）
 		//        | 1 | 1 | 4 | 5 | 1 | 4 |                     （第1行）
 		// 这里假设指针指向第一行的 \n，那么有

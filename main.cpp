@@ -1,6 +1,5 @@
 #include "argparse.hpp"
 #include "fmt/core.h"
-
 #include "tokenizer/tokenizer.h"
 #include "analyser/analyser.h"
 #include "fmts.hpp"
@@ -105,5 +104,5 @@ int main(int argc, char** argv) {
 		fmt::print(stderr, "You must choose tokenization or syntactic analysis.");
 		exit(2);
 	}
-	return 0;
+	exit(0);
 }
