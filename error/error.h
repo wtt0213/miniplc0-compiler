@@ -36,7 +36,11 @@ namespace miniplc0 {
 		ErrDuplicateDeclaration,
 		ErrNotInitialized,
 		ErrInvalidAssignment,
-		ErrInvalidPrint
+		ErrInvalidPrint,
+		//new
+		ErrNeedEqual,
+		ErrInvalidConstantValue,
+		ErrNeedRightBracket
 	};
 
 	class CompilationError final{
