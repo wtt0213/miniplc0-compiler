@@ -240,7 +240,7 @@ namespace miniplc0 {
 			// 对于其他的合法状态，进行合适的操作
 			// 比如进行解析、返回token、返回编译错误
 			
-			//当前状态为除号的状态
+			//当前状态为除号的状态s
 			case DIVISION_SIGN_STATE: {
 				unreadLast();
 				return std::make_pair(std::make_optional<Token>(TokenType::DIVISION_SIGN, '/', pos, currentPos()), std::optional<CompilationError>());
