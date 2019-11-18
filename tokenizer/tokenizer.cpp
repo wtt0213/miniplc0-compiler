@@ -133,6 +133,7 @@ namespace miniplc0 {
 					ss << ch; // 存储读到的字符
 				break;
 			}
+			// 如果当前状态是无符号整数
 			case UNSIGNED_INTEGER_STATE: {
 				// 请填空：ok
 				auto ch = current_char.value();
@@ -173,7 +174,7 @@ namespace miniplc0 {
 					}
 					//     解析成功则返回无符号整数类型的token，否则返回编译错误
 					if(success != -1)
-						return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, std::stoi(ss.str()), pos, currentPos()), std::optional<CompilationError>());
+						return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, ss.str(), pos, currentPos()), std::optional<CompilationError>());
 					else
 						return std::make_pair(std::optional<Token>(),std::make_optional<CompilationError>(pos,ErrorCode::ErrIntegerOverflow));
 				}
