@@ -208,15 +208,15 @@ namespace miniplc0 {
 				// 如果读到的字符不是上述情况之一，则回退读到的字符，并解析已经读到的字符串
 				else{
 					unreadLast();
-					if(ss.str().compare("BEGIN")==0)
+					if(ss.str().compare("begin")==0)
 						return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, ss.str(), pos, currentPos()), std::optional<CompilationError>());
-					else if(ss.str().compare("END")==0)
+					else if(ss.str().compare("end")==0)
 						return std::make_pair(std::make_optional<Token>(TokenType::END, ss.str(), pos, currentPos()), std::optional<CompilationError>());
-					else if(ss.str().compare("VAR")==0)
+					else if(ss.str().compare("var")==0)
 						return std::make_pair(std::make_optional<Token>(TokenType::VAR, ss.str(), pos, currentPos()), std::optional<CompilationError>());
-					else if(ss.str().compare("CONST")==0)
+					else if(ss.str().compare("const")==0)
 						return std::make_pair(std::make_optional<Token>(TokenType::CONST, ss.str(), pos, currentPos()), std::optional<CompilationError>());
-					else if(ss.str().compare("PRINT")==0)
+					else if(ss.str().compare("print")==0)
 						return std::make_pair(std::make_optional<Token>(TokenType::PRINT, ss.str(), pos, currentPos()), std::optional<CompilationError>());
 					else
 						return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, ss.str(), pos, currentPos()), std::optional<CompilationError>());

@@ -17,6 +17,7 @@ namespace miniplc0 {
 
 		// 'begin'
 		auto bg = nextToken();
+		printf("\n%s\n",bg);
 		if (!bg.has_value() || bg.value().GetType() != TokenType::BEGIN)
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoBegin);
 
@@ -118,6 +119,8 @@ namespace miniplc0 {
 			}
 			// <标识符>
 			next = nextToken();
+			//缓存一下
+			auto NEXT = next;
 			if(!next.has_value() || next.value().GetType() != TokenType::IDENTIFIER)
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNeedIdentifier);
 			//重复定义
@@ -139,8 +142,8 @@ namespace miniplc0 {
 				if (err.has_value())
 					return err;
 				//说明有等于号且有正确的值,是初始化变量
-				addVariable(next.value());
-				addInitializedVariable(next.value());
+				addVariable(NEXT.value());
+				addInitializedVariable(NEXT.value());
 			}
 			// ';'
 			next = nextToken();
@@ -387,8 +390,10 @@ namespace miniplc0 {
 			// 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
 			// 但是要注意 default 返回的是一个编译错误
 		case TokenType::IDENTIFIER:
+			_instructions.emplace_back(Operation::LOD,getIndex(next.value().GetValueString()));
 			return {};
 		case TokenType::UNSIGNED_INTEGER:
+			_instructions.emplace_back(Operation::LIT, std::stoi(next.value().GetValueString()));
 			return {};
 		case TokenType::LEFT_BRACKET:
 		{
