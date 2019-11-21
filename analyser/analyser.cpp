@@ -7,8 +7,12 @@ namespace miniplc0 {
 		auto err = analyseProgram();
 		if (err.has_value())
 			return std::make_pair(std::vector<Instruction>(), err);
+		else if(nextToken().has_value()){
+			return std::make_pair(std::vector<Instruction>(), std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrEndEarly));
+		}
 		else
 			return std::make_pair(_instructions, std::optional<CompilationError>());
+		
 	}
 
 	// <程序> ::= 'begin'<主过程>'end'
@@ -17,19 +21,20 @@ namespace miniplc0 {
 
 		// 'begin'
 		auto bg = nextToken();
-		printf("\n%s\n",bg);
+
 		if (!bg.has_value() || bg.value().GetType() != TokenType::BEGIN)
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoBegin);
 
 		// <主过程>
 		auto err = analyseMain();
-		if (err.has_value())
-			return err;
+		if (err.has_value()){ return err;}
+			
 
 		// 'end'
 		auto ed = nextToken();
-		if (!ed.has_value() || ed.value().GetType() != TokenType::END)
+		if (!ed.has_value() || ed.value().GetType() != TokenType::END){
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoEnd);
+		}
 		return {};
 	}
 
@@ -134,8 +139,9 @@ namespace miniplc0 {
 			if(next.value().GetType() != TokenType::EQUAL_SIGN){
 				unreadToken();
 				//如果没有等于号，说明未初始化
-				addUninitializedVariable(next.value());
-				addVariable(next.value());
+				//注意要先加入到var中，这是指针不变（改写了函数），下面类似
+				addVariable(NEXT.value());
+				addUninitializedVariable(NEXT.value());
 			}else{
 				// <表达式>
 				auto err = analyseExpression();
@@ -186,7 +192,8 @@ namespace miniplc0 {
 					return err;
 				break;
 			case TokenType::SEMICOLON:
-				return {};
+				nextToken();
+				break;
 			default:
 				break;
 			}
@@ -390,7 +397,9 @@ namespace miniplc0 {
 			// 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
 			// 但是要注意 default 返回的是一个编译错误
 		case TokenType::IDENTIFIER:
-			_instructions.emplace_back(Operation::LOD,getIndex(next.value().GetValueString()));
+			if(isUninitializedVariable(next.value().GetValueString()))
+				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotInitialized);
+			_instructions.emplace_back(Operation::LOD, getIndex(next.value().GetValueString()));
 			return {};
 		case TokenType::UNSIGNED_INTEGER:
 			_instructions.emplace_back(Operation::LIT, std::stoi(next.value().GetValueString()));
@@ -421,8 +430,8 @@ namespace miniplc0 {
 	}
 
 	std::optional<Token> Analyser::nextToken() {
-		if (_offset == _tokens.size())
-			return {};
+		if (_offset == _tokens.size()){ return {};}
+			
 		// 考虑到 _tokens[0..._offset-1] 已经被分析过了
 		// 所以我们选择 _tokens[0..._offset-1] 的 EndPos 作为当前位置
 		_current_pos = _tokens[_offset].GetEndPos();
@@ -443,8 +452,13 @@ namespace miniplc0 {
 		_nextTokenIndex++;
 	}
 
+	//一定要你先加入var的mp，再判断加入是否初始化的var的mp中
+	void Analyser::_add_no_incre(const Token& tk, std::map<std::string, int32_t>& mp) {
+		mp[tk.GetValueString()] = _nextTokenIndex;
+	}
+
 	void Analyser::addVariable(const Token& tk) {
-		_add(tk, _vars);
+		_add_no_incre(tk, _vars);
 	}
 
 	void Analyser::addConstant(const Token& tk) {
@@ -460,9 +474,7 @@ namespace miniplc0 {
 	}
 
 	int32_t Analyser::getIndex(const std::string& s) {
-		if (_uninitialized_vars.find(s) != _uninitialized_vars.end())
-			return _uninitialized_vars[s];
-		else if (_vars.find(s) != _vars.end())
+		if (_vars.find(s) != _vars.end())
 			return _vars[s];
 		else
 			return _consts[s];

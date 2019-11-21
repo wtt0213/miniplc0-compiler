@@ -69,6 +69,18 @@ namespace fmt {
 			case miniplc0::ErrInvalidPrint:
 				name = "The output statement is invalid.";
 				break;
+			case miniplc0::ErrEndEarly:
+				name = "The end is not the last token";
+				break;
+			case miniplc0::ErrInvalidConstantValue:
+				name = "The ConstantValue is invalid";
+				break;
+			case miniplc0::ErrNeedRightBracket:
+				name = "You donot have a RightBracket";
+				break;
+			case miniplc0::ErrNeedEqual:
+				name = "You donot have a Equal Sign";
+				break;
 			}
 			return format_to(ctx.out(), name);
 		}

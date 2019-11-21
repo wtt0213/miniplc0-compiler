@@ -40,7 +40,8 @@ namespace miniplc0 {
 		//new
 		ErrNeedEqual,
 		ErrInvalidConstantValue,
-		ErrNeedRightBracket
+		ErrNeedRightBracket,
+		ErrEndEarly
 	};
 
 	class CompilationError final{

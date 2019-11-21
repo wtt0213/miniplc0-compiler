@@ -67,6 +67,8 @@ namespace miniplc0 {
 
 		// helper function
 		void _add(const Token&, std::map<std::string, int32_t>&);
+		//这个是加入mp中但是指针不会++，这是因为如果要同时加入到var和initial_var中中，会加两次
+		void _add_no_incre(const Token&, std::map<std::string, int32_t>&);
 		// 添加变量、常量、未初始化的变量
 		void addVariable(const Token&);
 		void addConstant(const Token&);
