@@ -9,6 +9,9 @@ namespace miniplc0 {
 			return std::make_pair(std::vector<Instruction>(), err);
 		else
 			return std::make_pair(_instructions, std::optional<CompilationError>());
+		// else if(nextToken().has_value()){
+		// 	return std::make_pair(std::vector<Instruction>(), std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrEndEarly));
+		// }
 		
 	}
 
