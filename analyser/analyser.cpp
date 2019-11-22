@@ -11,8 +11,7 @@ namespace miniplc0 {
 			return std::make_pair(_instructions, std::optional<CompilationError>());
 		// else if(nextToken().has_value()){
 		// 	return std::make_pair(std::vector<Instruction>(), std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrEndEarly));
-		// }
-		
+		// }	
 	}
 
 	// <程序> ::= 'begin'<主过程>'end'
@@ -288,6 +287,8 @@ namespace miniplc0 {
 		// 标识符声明过吗？
 		if(!isDeclared(next.value().GetValueString()))
 			std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
+		//缓存标识符
+		auto identity = next;
 		//'='
 		next = nextToken();
 		if(!next.has_value()||next.value().GetType() != TokenType::EQUAL_SIGN)
@@ -300,7 +301,10 @@ namespace miniplc0 {
 		next = nextToken();
 		if(!next.has_value()||next.value().GetType() != TokenType::SEMICOLON)
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-		
+		//这时需要生成指令，需要把栈顶的数储存
+		_instructions.emplace_back(Operation::STO, getIndex(identity.value().GetValueString()));
+		if(isUninitializedVariable(identity.value().GetValueString()))
+			Analyser::Uninit_to_init(identity.value().GetValueString());
 		return {};
 	}
 
@@ -376,11 +380,12 @@ namespace miniplc0 {
 	std::optional<CompilationError> Analyser::analyseFactor() {
 		// [<符号>]
 		auto next = nextToken();
-		auto prefix = 1;
+		auto prefix = 0;
 		if (!next.has_value())
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-		if (next.value().GetType() == TokenType::PLUS_SIGN)
+		if (next.value().GetType() == TokenType::PLUS_SIGN){
 			prefix = 1;
+		}
 		else if (next.value().GetType() == TokenType::MINUS_SIGN) {
 			prefix = -1;
 			_instructions.emplace_back(Operation::LIT, 0);
@@ -400,10 +405,10 @@ namespace miniplc0 {
 			if(isUninitializedVariable(next.value().GetValueString()))
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotInitialized);
 			_instructions.emplace_back(Operation::LOD, getIndex(next.value().GetValueString()));
-			return {};
+			break;
 		case TokenType::UNSIGNED_INTEGER:
 			_instructions.emplace_back(Operation::LIT, std::stoi(next.value().GetValueString()));
-			return {};
+			break;
 		case TokenType::LEFT_BRACKET:
 		{
 			//<表达式>
@@ -421,8 +426,8 @@ namespace miniplc0 {
 		}
 		
 		//取正
-		if(prefix == 1)
-			_instructions.emplace_back(Operation::ADD, 0);
+		// if(prefix == 1)
+		// 	_instructions.emplace_back(Operation::ADD, 0);
 		// 取负
 		if (prefix == -1)
 			_instructions.emplace_back(Operation::SUB, 0);
@@ -497,5 +502,11 @@ namespace miniplc0 {
 	}
 	bool Analyser::isVariable(const std::string&s) {
 		return _vars.find(s) != _vars.end();
+	}
+	void Analyser::Uninit_to_init(const std::string&s){
+		std::map<std::string, int32_t>::iterator it;
+		it = _uninitialized_vars.find(s);
+		_uninitialized_vars.erase(it);
+		_initialized_vars[s]=0;
 	}
 }

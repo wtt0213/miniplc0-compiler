@@ -86,6 +86,8 @@ namespace miniplc0 {
 		bool isVariable(const std::string&);
 		// 获得 {变量，常量} 在栈上的偏移
 		int32_t getIndex(const std::string&);
+		// 从未初始化变量转移到初始化变量
+		void Uninit_to_init(const std::string&);
 	private:
 		std::vector<Token> _tokens;
 		std::size_t _offset;
