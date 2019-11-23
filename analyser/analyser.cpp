@@ -141,6 +141,7 @@ namespace miniplc0 {
 				//注意要先加入到var中，这是指针不变（改写了函数），下面类似
 				addVariable(NEXT.value());
 				addUninitializedVariable(NEXT.value());
+				_instructions.emplace_back(Operation::LIT,0);
 			}else{
 				// <表达式>
 				auto err = analyseExpression();
